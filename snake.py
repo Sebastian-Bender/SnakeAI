@@ -67,8 +67,12 @@ class Food():
         self.color = (223, 163, 49)
         self.randomize_position()
 
-    def randomize_position(self):
-        self.position = (random.randint(0, grid_width-1)*gridsize, random.randint(0, grid_height-1)*gridsize)
+    def randomize_position(self, snakePositions = []):
+        pos = (random.randint(0, grid_width-1)*gridsize, random.randint(0, grid_height-1)*gridsize)
+        if pos in snakePositions:
+            self.randomize_position(snakePositions)
+        else:
+            self.position = pos
 
     def draw(self, surface):
         r = pygame.Rect((self.position[0], self.position[1]), (gridsize, gridsize))
@@ -120,7 +124,7 @@ def main():
         if snake.get_head_position() == food.position:
             snake.length += 1
             snake.score += 1
-            food.randomize_position()
+            food.randomize_position(snake.positions)
         snake.draw(surface)
         food.draw(surface)
         screen.blit(surface, (0,0))
