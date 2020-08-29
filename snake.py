@@ -5,10 +5,9 @@ import random
 class Snake():
     def __init__(self):
         self.length = 1
-        #self.positions = [((screen_width/2), (screen_height/2))]
         self.positions = [(0, 0)]
         self.direction = down
-        self.color = (17, 24, 47)
+        self.color = (10, 10, 10)
 
         self.score = 0
 
@@ -37,7 +36,6 @@ class Snake():
 
     def reset(self):
         self.length = 1
-        #self.positions = [((screen_width/2), (screen_height/2))]
         self.positions = [(0, 0)]
         self.direction = down
         self.score = 0
@@ -45,7 +43,10 @@ class Snake():
     def draw(self,surface):
         for p in self.positions:
             r = pygame.Rect((p[0], p[1]), (gridsize, gridsize))
-            pygame.draw.rect(surface, self.color, r)
+            c = self.color
+            if p == self.get_head_position():
+                c = (75, 100, 100)
+            pygame.draw.rect(surface, c, r)
             pygame.draw.rect(surface, (93,216, 228), r, 1)
 
     def controls(self):
@@ -70,7 +71,7 @@ class Snake():
             self.turn(down)
         elif self.get_head_position()[1] == 460 and self.direction != down:
             self.turn(up)
-        elif self.get_head_position()[1] == 460 or self.get_head_position()[1] == 20 and self.get_head_position()[0] != 460:
+        elif (self.get_head_position()[1] == 460 or self.get_head_position()[1] == 20) and self.get_head_position()[0] != 460:
             self.turn(right)
 
 class Food():
@@ -127,16 +128,17 @@ def main():
     food = Food()
 
     myfont = pygame.font.SysFont("monospace",16)
-
+    limit = 10
     while (True):
         # check if snake length == grid_width * grid_height
         if snake.length == grid_width * grid_height:
             print('Game won')
             return
 
-        clock.tick(10000)
+        clock.tick(limit)
         if len(sys.argv) == 2 and sys.argv[1] == 'hamiltonian':
             snake.hamiltonian_cycle()
+            limit = 0
         
         snake.controls()
         drawGrid(surface)
@@ -148,7 +150,7 @@ def main():
         snake.draw(surface)
         food.draw(surface)
         screen.blit(surface, (0,0))
-        text = myfont.render(f"Score {snake.score}", 1, (0,0,0))
+        text = myfont.render(f"Score {snake.score}", 1, (255,255,255))
         screen.blit(text, (5,10))
         pygame.display.update()
 
