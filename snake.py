@@ -5,8 +5,9 @@ import random
 class Snake():
     def __init__(self):
         self.length = 1
-        self.positions = [((screen_width/2), (screen_height/2))]
-        self.direction = right
+        #self.positions = [((screen_width/2), (screen_height/2))]
+        self.positions = [(0, 0)]
+        self.direction = down
         self.color = (17, 24, 47)
 
         self.score = 0
@@ -36,8 +37,9 @@ class Snake():
 
     def reset(self):
         self.length = 1
-        self.positions = [((screen_width/2), (screen_height/2))]
-        self.direction = right
+        #self.positions = [((screen_width/2), (screen_height/2))]
+        self.positions = [(0, 0)]
+        self.direction = down
         self.score = 0
 
     def draw(self,surface):
@@ -46,7 +48,7 @@ class Snake():
             pygame.draw.rect(surface, self.color, r)
             pygame.draw.rect(surface, (93,216, 228), r, 1)
 
-    def handle_keys(self):
+    def controls(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -60,6 +62,16 @@ class Snake():
                     self.turn(left)
                 elif event.key == pygame.K_RIGHT:
                     self.turn(right)
+    
+    def hamiltonian_cycle(self):
+        if self.get_head_position()[1] == 0 and self.get_head_position()[0] == 460:
+            self.turn(left)
+        elif (self.get_head_position()[1] == 20 and self.direction != up) or (self.get_head_position() == (0, 0)):
+            self.turn(down)
+        elif self.get_head_position()[1] == 460 and self.direction != down:
+            self.turn(up)
+        elif self.get_head_position()[1] == 460 or self.get_head_position()[1] == 20 and self.get_head_position()[0] != 460:
+            self.turn(right)
 
 class Food():
     def __init__(self):
@@ -117,8 +129,16 @@ def main():
     myfont = pygame.font.SysFont("monospace",16)
 
     while (True):
-        clock.tick(10)
-        snake.handle_keys()
+        # check if snake length == grid_width * grid_height
+        if snake.length == grid_width * grid_height:
+            print('Game won')
+            return
+
+        clock.tick(10000)
+        if len(sys.argv) == 2 and sys.argv[1] == 'hamiltonian':
+            snake.hamiltonian_cycle()
+        
+        snake.controls()
         drawGrid(surface)
         snake.move()
         if snake.get_head_position() == food.position:
